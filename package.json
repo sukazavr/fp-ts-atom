@@ -1,0 +1,36 @@
+{
+  "name": "fp-ts-atom",
+  "homepage": "http://",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "fp-ts": "^2.9.5"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/jest": "^26.0.20",
+    "@typescript-eslint/eslint-plugin": "^4.25.0",
+    "@typescript-eslint/parser": "^4.25.0",
+    "docs-ts": "^0.6.10",
+    "eslint": "^7.27.0",
+    "fp-ts": "^2.9.5",
+    "jest": "^26.6.3",
+    "markdown-magic": "^2.0.0",
+    "prettier": "^2.2.1",
+    "prettier-plugin-jsdoc": "^0.3.13",
+    "ts-jest": "^26.5.3",
+    "typescript": "^4.2.3"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "build:watch": "tsc -w -p tsconfig.build.json",
+    "prepublish": "npm run build",
+    "pretty": "npm run prettier --check .",
+    "lint": "npm run eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "test": "npm run jest",
+    "test:watch": "npm run jest --watch",
+    "docs": "npm run docs-ts",
+    "md": "npm run markdown"
+  }
+}
