@@ -1,11 +1,13 @@
 {
   "name": "fp-ts-atom",
-  "homepage": "http://",
-  "version": "1.0.0",
+  "homepage": "https://github.com/sukazavr/fp-ts-atom",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "license": "MIT",
   "peerDependencies": {
-    "fp-ts": "^2.9.5"
+    "fp-ts": "^2.9.5",
+    "monocle-ts": "^2.0.0",
+    "rxjs": "^7.0.0"
   },
   "dependencies": {},
   "devDependencies": {
@@ -17,8 +19,11 @@
     "fp-ts": "^2.9.5",
     "jest": "^26.6.3",
     "markdown-magic": "^2.0.0",
+    "monocle-ts": "^2.3.11",
     "prettier": "^2.2.1",
     "prettier-plugin-jsdoc": "^0.3.13",
+    "rxjs": "^7.4.0",
+    "rxjs-marbles": "^7.0.1",
     "ts-jest": "^26.5.3",
     "typescript": "^4.2.3"
   },
@@ -26,11 +31,11 @@
     "build": "tsc -p tsconfig.build.json",
     "build:watch": "tsc -w -p tsconfig.build.json",
     "prepublish": "npm run build",
-    "pretty": "npm run prettier --check .",
-    "lint": "npm run eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
-    "test": "npm run jest",
-    "test:watch": "npm run jest --watch",
-    "docs": "npm run docs-ts",
-    "md": "npm run markdown"
+    "pretty": "prettier --check .",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "docs": "docs-ts",
+    "md": "markdown"
   }
 }

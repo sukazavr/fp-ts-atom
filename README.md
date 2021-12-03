@@ -7,10 +7,8 @@
 ---
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
-
 - [Install](#install)
 - [Example](#example)
-
 <!-- AUTO-GENERATED-CONTENT:END -->
 
 ## Install

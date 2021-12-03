@@ -1,19 +1,14 @@
 /** @since 1.0.0 */
 
-import { pipe } from 'fp-ts/function'
+import { Mim } from './Mim'
+import * as atom from './Atom'
+import * as readonlyAtom from './ReadonlyAtom'
 
-// -----------------------------------------------------------------------------
-// greetings
-// -----------------------------------------------------------------------------
-
-/**
- * It's a greeting
- *
- * @since 1.0.0
- * @category Greetings
- * @example
- *   import { greet } from 'fp-ts-atom'
- *   assert.deepStrictEqual(greet('World'), 'Hello, World!')
- */
-export const greet = (name: string): string =>
-  pipe(`Hello`, (x) => `${x}, ${name}!`)
+export {
+  /** @since 1.0.0 */
+  Mim,
+  /** @since 1.0.0 */
+  atom,
+  /** @since 1.0.0 */
+  readonlyAtom,
+}
