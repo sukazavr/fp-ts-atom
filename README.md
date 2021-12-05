@@ -28,7 +28,10 @@ npm install fp-ts fp-ts-atom
 ## Example
 
 ```ts
-import * as Lib from 'fp-ts-atom'
+import * as a from 'fp-ts-atom/Atom'
 
-// write an example...
+const state$ = a.atom(0);
+state$.get(); // 0
+state$.set(3);
+state$.get(); // 3
 ```
