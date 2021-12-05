@@ -1,3 +1,4 @@
+/** @since 1.0.0 */
 import { Applicative1 } from 'fp-ts/Applicative'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
@@ -23,8 +24,14 @@ export interface Atom<T> extends Observable<T> {
   set: (next: T) => void
 }
 
+/**
+ * @since 1.0.0
+ * @category Classes
+ */
 export class AtomImpl<T> extends Mim<T> implements Atom<T> {
+  /** @since 1.0.0 */
   public set = this.setValue
+  /** @since 1.0.0 */
   public get = this.getValue
 }
 
@@ -192,6 +199,7 @@ export const index: <A>(
  * Return an `Atom` from an `AtomOption` replacing `None` with the given value.
  *
  * @since 1.0.0
+ * @category Utils
  */
 export const withDefault: <A>(
   d: Lazy<A>,

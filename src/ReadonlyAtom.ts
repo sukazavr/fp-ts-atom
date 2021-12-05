@@ -1,3 +1,4 @@
+/** @since 1.0.0 */
 import { Applicative1 } from 'fp-ts/Applicative'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
@@ -21,7 +22,12 @@ export interface ReadonlyAtom<T> extends Observable<T> {
   get: () => T
 }
 
+/**
+ * @since 1.0.0
+ * @category Classes
+ */
 export class ReadonlyAtomImpl<T> extends Mim<T> implements ReadonlyAtom<T> {
+  /** @since 1.0.0 */
   public get = this.getValue
 }
 
@@ -164,6 +170,7 @@ export const index: <A>(
  * the given value.
  *
  * @since 1.0.0
+ * @category Utils
  */
 export const withDefault: <A>(
   d: Lazy<A>,
