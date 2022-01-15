@@ -1,5 +1,6 @@
 /** @since 1.0.0 */
 import { Applicative1 } from 'fp-ts/Applicative'
+import { Apply1 } from 'fp-ts/Apply'
 import { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
@@ -11,7 +12,7 @@ import * as AR from 'fp-ts/ReadonlyArray'
 import * as RR from 'fp-ts/ReadonlyRecord'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import { Lens } from 'monocle-ts/Lens'
-import { EMPTY, map as rxMap, Observable } from 'rxjs'
+import { combineLatest, EMPTY, map as rxMap, Observable } from 'rxjs'
 import { Mim } from './Mim'
 
 /**
@@ -101,6 +102,23 @@ const _mapStrict: <A, B>(
 export const map: <A, B>(
   f: (a: A) => B
 ) => (fa: ReadonlyAtom<A>) => ReadonlyAtom<B> = _mapStrict
+
+/**
+ * Apply a function to an argument under a type constructor.
+ *
+ * @since 1.1.0
+ * @category Apply
+ */
+export const ap: <A>(
+  fa: ReadonlyAtom<A>
+) => <B>(fab: ReadonlyAtom<(a: A) => B>) => ReadonlyAtom<B> = (fa) => (fab) =>
+  make(
+    () => fab.get()(fa.get()),
+    pipe(
+      combineLatest([fab, fa]),
+      rxMap(([f, a]) => f(a))
+    )
+  )
 
 // -------------------------------------------------------------------------------------
 // compositions
@@ -193,6 +211,9 @@ export const withDefault: <A>(
 // instances
 // -------------------------------------------------------------------------------------
 
+const map_: Functor1<URI>['map'] = (fa, f) => pipe(fa, map(f))
+const ap_: Apply1<URI>['ap'] = (fab, fa) => pipe(fab, ap(fa))
+
 /**
  * @since 1.0.0
  * @category Instances
@@ -217,7 +238,7 @@ declare module 'fp-ts/lib/HKT' {
  */
 export const Functor: Functor1<URI> = {
   URI,
-  map: (fa, f) => pipe(fa, _mapStrict(f)),
+  map: map_,
 }
 
 /**
@@ -236,4 +257,25 @@ export const Pointed: Pointed1<URI> = {
 export const FromIO: FromIO1<URI> = {
   URI,
   fromIO,
+}
+
+/**
+ * @since 1.1.0
+ * @category Instances
+ */
+export const Apply: Apply1<URI> = {
+  URI,
+  map: map_,
+  ap: ap_,
+}
+
+/**
+ * @since 1.1.0
+ * @category Instances
+ */
+export const Applicative: Applicative1<URI> = {
+  URI,
+  map: map_,
+  ap: ap_,
+  of,
 }

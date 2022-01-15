@@ -174,6 +174,23 @@ describe('map', () => {
   })
 })
 
+describe('ap', () => {
+  testBasic((prop) =>
+    pipe(
+      _.of((v: { prop: TestStruct }) => v.prop),
+      _.ap(_.of({ prop }))
+    )
+  )
+  it('should calculate nested value', () => {
+    const a = ctorValue()
+    const mapped = pipe(
+      _.of((v: TestStruct) => v.a.b + 1),
+      _.ap(_.of(a))
+    )
+    expect(mapped.get() === a.a.b + 1).toBeTruthy()
+  })
+})
+
 describe('lens', () => {
   testBasic((prop) =>
     pipe(
