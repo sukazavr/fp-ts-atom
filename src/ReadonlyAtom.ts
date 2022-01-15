@@ -1,5 +1,6 @@
 /** @since 1.0.0 */
 import { Applicative1 } from 'fp-ts/Applicative'
+import { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
 import { Lazy, pipe } from 'fp-ts/function'
@@ -106,7 +107,7 @@ export const map: <A, B>(
 // -------------------------------------------------------------------------------------
 
 /**
- * Compose an `ReadonlyAtom` with a `Lens`.
+ * Compose a `ReadonlyAtom` with a `Lens`.
  *
  * @since 1.0.0
  * @category Compositions
@@ -118,7 +119,7 @@ export const lens: <A, B>(
   _map(eq)(ab.get)
 
 /**
- * Return an `ReadonlyAtom` from an `ReadonlyAtom` and prop.
+ * Return a `ReadonlyAtom` from a `ReadonlyAtom` and prop.
  *
  * @since 1.0.0
  * @category Compositions
@@ -130,7 +131,7 @@ export const prop: <A, P extends keyof A>(
   _map(eq)((s) => s[prop])
 
 /**
- * Return an `ReadonlyAtomOption` from an `ReadonlyAtom` focused on a key of a
+ * Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on a key of a
  * `ReadonlyRecord`. If you set `None` it won't change the `ReadonlyRecord`.
  *
  * @since 1.0.0
@@ -145,8 +146,8 @@ export const key: <A>(
   _map(O.getEq(eq))(RR.lookup(k))
 
 /**
- * Return an `ReadonlyAtomOption` from an `ReadonlyAtom` focused on an index of
- * a `ReadonlyArray`. If you set `None` it won't change the `ReadonlyArray`. If
+ * Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on an index of a
+ * `ReadonlyArray`. If you set `None` it won't change the `ReadonlyArray`. If
  * the index is out of bound, it won't change the `ReadonlyArray` no matter what
  * you pass as `Option`.
  *
@@ -166,8 +167,18 @@ export const index: <A>(
 // -------------------------------------------------------------------------------------
 
 /**
- * Return an `ReadonlyAtom` from an `ReadonlyAtomOption` replacing `None` with
- * the given value.
+ * Return a `ReadonlyAtom` from a `ReadonlyAtom` with new Eq instance.
+ *
+ * @since 1.1.0
+ * @category Utils
+ */
+export const distinct: <A>(eq: Eq<A>) => Endomorphism<ReadonlyAtom<A>> =
+  (eq) => (a) =>
+    make(a.get, a, eq)
+
+/**
+ * Return a `ReadonlyAtom` from a `ReadonlyAtomOption` replacing `None` with the
+ * given value.
  *
  * @since 1.0.0
  * @category Utils

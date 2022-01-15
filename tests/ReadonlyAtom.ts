@@ -295,3 +295,16 @@ describe('withDefault', () => {
     )
   )
 })
+
+describe('distinct', () => {
+  testEq((initial, source, eq) =>
+    pipe(
+      _.make(
+        getOrElse(() => initial),
+        source,
+        eqStrict
+      ),
+      _.distinct(eq)
+    )
+  )
+})
