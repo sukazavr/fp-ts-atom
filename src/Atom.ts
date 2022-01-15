@@ -4,16 +4,15 @@ import { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
 import { identity, Lazy, pipe } from 'fp-ts/function'
+import * as AR from 'fp-ts/lib/ReadonlyArray'
+import * as RR from 'fp-ts/lib/ReadonlyRecord'
 import * as O from 'fp-ts/Option'
 import { Pointed1 } from 'fp-ts/Pointed'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import { Lens, lens as ctorLens } from 'monocle-ts/Lens'
 import { EMPTY, map, Observable } from 'rxjs'
-import { ReadonlyAtom } from './ReadonlyAtom'
-import * as RR from 'fp-ts/lib/ReadonlyRecord'
-import * as AR from 'fp-ts/lib/ReadonlyArray'
 import { Mim } from './Mim'
-import { make as arMake } from './ReadonlyAtom'
+import { make as arMake, ReadonlyAtom } from './ReadonlyAtom'
 
 /**
  * @since 1.0.0
@@ -196,6 +195,26 @@ export const index: <A>(
 // -------------------------------------------------------------------------------------
 // utils
 // -------------------------------------------------------------------------------------
+
+/**
+ * Sequence of `Atom.get` and `Atom.set` using `Endomorphism` to modify the value.
+ *
+ * @since 1.1.0
+ * @category Utils
+ */
+export const modify: <A>(e: Endomorphism<A>) => (a: Atom<A>) => void =
+  (e) => (a) =>
+    pipe(a.get(), e, a.set)
+
+/**
+ * Like `modify` but flipped, which the “V” suffix denotes.
+ *
+ * @since 1.1.0
+ * @category Utils
+ */
+export const modifyV: <A>(a: Atom<A>) => (e: Endomorphism<A>) => void =
+  (a) => (e) =>
+    pipe(a.get(), e, a.set)
 
 /**
  * Return an `Atom` from an `Atom` with new Eq instance.

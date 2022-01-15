@@ -381,3 +381,26 @@ describe('toReadonlyAtom', () => {
     expect(pipe(1, _.of, _.toReadonlyAtom, ar.isReadonlyAtom)).toBeTruthy()
   })
 })
+
+describe('modify', () => {
+  it('should modify', () => {
+    const a = ctorValue()
+    const b = ctorValue()
+    const e = jest.fn(() => b)
+    const atom = _.of(a)
+    _.modify(e)(atom)
+    expect(e).toBeCalledTimes(1)
+    expect(e).toBeCalledWith(a)
+    expect(atom.get()).toBe(b)
+  })
+  it('should modifyV', () => {
+    const a = ctorValue()
+    const b = ctorValue()
+    const e = jest.fn(() => b)
+    const atom = _.of(a)
+    _.modifyV(atom)(e)
+    expect(e).toBeCalledTimes(1)
+    expect(e).toBeCalledWith(a)
+    expect(atom.get()).toBe(b)
+  })
+})
