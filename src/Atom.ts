@@ -43,7 +43,8 @@ export class AtomImpl<T> extends Mim<T> implements Atom<T> {
  * @since 1.0.0
  * @category Refinements
  */
-export const isAtom = <T>(fa: unknown): fa is Atom<T> => fa instanceof AtomImpl
+export const isAtom = <T>(fa: unknown): fa is Atom<T> =>
+  fa instanceof Mim && 'get' in fa && 'set' in fa
 
 // -------------------------------------------------------------------------------------
 // constructors

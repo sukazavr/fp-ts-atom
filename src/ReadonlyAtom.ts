@@ -39,8 +39,8 @@ export class ReadonlyAtomImpl<T> extends Mim<T> implements ReadonlyAtom<T> {
  * @since 1.0.0
  * @category Refinements
  */
-export const isReadonlyAtom = <T>(fa: unknown): fa is ReadonlyAtomImpl<T> =>
-  fa instanceof ReadonlyAtomImpl
+export const isReadonlyAtom = <T>(fa: unknown): fa is ReadonlyAtom<T> =>
+  fa instanceof Mim && 'get' in fa
 
 // -------------------------------------------------------------------------------------
 // constructors

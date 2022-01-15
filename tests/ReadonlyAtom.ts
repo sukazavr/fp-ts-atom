@@ -105,9 +105,9 @@ const testEq = (
 describe('isReadonlyAtom', () => {
   it('should be true', () => {
     expect(_.isReadonlyAtom(_.of(ctorValue()))).toBeTruthy()
+    expect(_.isReadonlyAtom(a.of(ctorValue()))).toBeTruthy()
   })
   it('should be false', () => {
-    expect(_.isReadonlyAtom(a.of(ctorValue()))).toBeFalsy()
     expect(_.isReadonlyAtom(1)).toBeFalsy()
     expect(_.isReadonlyAtom({})).toBeFalsy()
     expect(_.isReadonlyAtom(r.noop)).toBeFalsy()
