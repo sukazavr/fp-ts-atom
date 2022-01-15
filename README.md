@@ -16,8 +16,8 @@ State management solution combining `fp-ts`, `RxJS` and `monocle-ts`
 
 <!-- AUTO-GENERATED-CONTENT:START (TOC) -->
 - [Features](#features)
-- [Example](#example)
-- [API Reference](#api-reference)
+- [Atom](#atom)
+- [ReadonlyAtom](#readonlyatom)
 - [Install](#install)
 <!-- AUTO-GENERATED-CONTENT:END -->
 
@@ -32,21 +32,43 @@ State management solution combining `fp-ts`, `RxJS` and `monocle-ts`
 - 🦺 Type-safe operations
 - 🧪 Covered by tests
 
-## Example
+## Atom
+
+General usage of the `Atom` is to store an application state. `Atom` has a `get` and `set` methods that allow to read and write the state. Apart from that, `Atom` is a hot `Observable` which means that you can listen to changes of the state.
+
+`Atom` has `fp-ts` instances: `Pointed`, `FromIO`.
 
 ```ts
-import * as a from 'fp-ts-atom/Atom'
-
-const state$ = a.of(0);
+import { of } from 'fp-ts-atom/Atom';
+const state$ = of(0);
 state$.get(); // 0
 state$.set(3);
 state$.get(); // 3
+state$.subscribe(console.log); // "3" in console
+state$.set(2); // "2" in console
 ```
 
-## API Reference
+[Atom API Reference](https://sukazavr.github.io/fp-ts-atom/modules/Atom.ts.html)
 
-- [Atom](https://sukazavr.github.io/fp-ts-atom/modules/Atom.ts.html)
-- [ReadonlyAtom](https://sukazavr.github.io/fp-ts-atom/modules/ReadonlyAtom.ts.html)
+## ReadonlyAtom
+
+`ReadonlyAtom` is useful when you want to protect the state from direct changes. You can derive `ReadonlyAtom` from `Atom` using `toReadonlyAtom` method from `Atom` module or any other method from `ReadonlyAtom` module.
+
+`ReadonlyAtom` has `fp-ts` instances: `Pointed`, `FromIO`, `Functor`, `Apply`, `Applicative`.
+
+```ts
+import { of } from 'fp-ts-atom/Atom';
+import { map } from 'fp-ts-atom/ReadonlyAtom';
+const state$ = of({ a: 0 });
+const number$ = pipe(state$, map(s => s.a));
+number$.get(); // 0
+state$.set({ a: 3 });
+number$.get(); // 3
+number$.subscribe(console.log); // "3" in console
+state$.set({ a: 2 }); // "2" in console
+```
+
+[ReadonlyAtom API Reference](https://sukazavr.github.io/fp-ts-atom/modules/ReadonlyAtom.ts.html)
 
 ## Install
 
