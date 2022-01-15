@@ -359,6 +359,23 @@ describe('withDefault', () => {
   })
 })
 
+describe('distinct', () => {
+  it('should distinct', () => {
+    const a = ctorValue()
+    const c = ctorValue()
+    const root = pipe(
+      _.of(a),
+      _.distinct({
+        equals: (prev, next) => prev.a.b === next.a.b,
+      })
+    )
+    root.set({ a: { b: a.a.b } })
+    expect(root.get()).toBe(a)
+    root.set(c)
+    expect(root.get()).toBe(c)
+  })
+})
+
 describe('toReadonlyAtom', () => {
   it('should convert to ReadonlyAtom', () => {
     expect(pipe(1, _.of, _.toReadonlyAtom, ar.isReadonlyAtom)).toBeTruthy()

@@ -1,5 +1,6 @@
 /** @since 1.0.0 */
 import { Applicative1 } from 'fp-ts/Applicative'
+import { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
 import { identity, Lazy, pipe } from 'fp-ts/function'
@@ -107,7 +108,7 @@ export const lens: <A, B>(
 ) => (a: Atom<A>) => Atom<B> =
   (ab, eq = eqStrict) =>
   (a) => {
-    const b = new AtomImpl(() => ab.get(a.get()), map(ab.get)(a), eq)
+    const b = make(() => ab.get(a.get()), map(ab.get)(a), eq)
     b.set = (nextB) => {
       const prevA = a.get()
       const prevB = ab.get(prevA)
@@ -195,6 +196,24 @@ export const index: <A>(
 // -------------------------------------------------------------------------------------
 // utils
 // -------------------------------------------------------------------------------------
+
+/**
+ * Return an `Atom` from an `Atom` with new Eq instance.
+ *
+ * @since 1.1.0
+ * @category Utils
+ */
+export const distinct: <A>(eq: Eq<A>) => Endomorphism<Atom<A>> =
+  (eq) => (a) => {
+    const b = make(a.get, a, eq)
+    b.set = (nextB) => {
+      const prevB = a.get()
+      if (!eq.equals(prevB, nextB)) {
+        a.set(nextB)
+      }
+    }
+    return b
+  }
 
 /**
  * Return an `Atom` from an `AtomOption` replacing `None` with the given value.
