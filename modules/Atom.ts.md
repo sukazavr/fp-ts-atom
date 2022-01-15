@@ -37,6 +37,9 @@ Added in v1.0.0
 - [Refinements](#refinements)
   - [isAtom](#isatom)
 - [Utils](#utils)
+  - [distinct](#distinct)
+  - [modify](#modify)
+  - [modifyV](#modifyv)
   - [withDefault](#withdefault)
 
 ---
@@ -247,6 +250,42 @@ export declare const isAtom: <T>(fa: unknown) => fa is Atom<T>
 Added in v1.0.0
 
 # Utils
+
+## distinct
+
+Return an `Atom` from an `Atom` with new Eq instance.
+
+**Signature**
+
+```ts
+export declare const distinct: <A>(eq: Eq<A>) => Endomorphism<Atom<A>>
+```
+
+Added in v1.1.0
+
+## modify
+
+Sequence of `Atom.get` and `Atom.set` using `Endomorphism` to modify the value.
+
+**Signature**
+
+```ts
+export declare const modify: <A>(e: Endomorphism<A>) => (a: Atom<A>) => void
+```
+
+Added in v1.1.0
+
+## modifyV
+
+Like `modify` but flipped, which the “V” suffix denotes.
+
+**Signature**
+
+```ts
+export declare const modifyV: <A>(a: Atom<A>) => (e: Endomorphism<A>) => void
+```
+
+Added in v1.1.0
 
 ## withDefault
 

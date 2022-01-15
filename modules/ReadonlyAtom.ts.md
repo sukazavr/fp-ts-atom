@@ -12,6 +12,8 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
+- [Apply](#apply)
+  - [ap](#ap)
 - [Classes](#classes)
   - [ReadonlyAtomImpl (class)](#readonlyatomimpl-class)
     - [get (property)](#get-property)
@@ -27,6 +29,8 @@ Added in v1.0.0
 - [Functor](#functor)
   - [map](#map)
 - [Instances](#instances)
+  - [Applicative](#applicative)
+  - [Apply](#apply-1)
   - [FromIO](#fromio)
   - [Functor](#functor-1)
   - [Pointed](#pointed)
@@ -37,9 +41,24 @@ Added in v1.0.0
 - [Refinements](#refinements)
   - [isReadonlyAtom](#isreadonlyatom)
 - [Utils](#utils)
+  - [distinct](#distinct)
   - [withDefault](#withdefault)
 
 ---
+
+# Apply
+
+## ap
+
+Apply a function to an argument under a type constructor.
+
+**Signature**
+
+```ts
+export declare const ap: <A>(fa: ReadonlyAtom<A>) => <B>(fab: ReadonlyAtom<(a: A) => B>) => ReadonlyAtom<B>
+```
+
+Added in v1.1.0
 
 # Classes
 
@@ -67,8 +86,8 @@ Added in v1.0.0
 
 ## index
 
-Return an `ReadonlyAtomOption` from an `ReadonlyAtom` focused on an index of
-a `ReadonlyArray`. If you set `None` it won't change the `ReadonlyArray`. If
+Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on an index of a
+`ReadonlyArray`. If you set `None` it won't change the `ReadonlyArray`. If
 the index is out of bound, it won't change the `ReadonlyArray` no matter what
 you pass as `Option`.
 
@@ -85,7 +104,7 @@ Added in v1.0.0
 
 ## key
 
-Return an `ReadonlyAtomOption` from an `ReadonlyAtom` focused on a key of a
+Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on a key of a
 `ReadonlyRecord`. If you set `None` it won't change the `ReadonlyRecord`.
 
 **Signature**
@@ -101,7 +120,7 @@ Added in v1.0.0
 
 ## lens
 
-Compose an `ReadonlyAtom` with a `Lens`.
+Compose a `ReadonlyAtom` with a `Lens`.
 
 **Signature**
 
@@ -113,7 +132,7 @@ Added in v1.0.0
 
 ## prop
 
-Return an `ReadonlyAtom` from an `ReadonlyAtom` and prop.
+Return a `ReadonlyAtom` from a `ReadonlyAtom` and prop.
 
 **Signature**
 
@@ -178,6 +197,26 @@ export declare const map: <A, B>(f: (a: A) => B) => (fa: ReadonlyAtom<A>) => Rea
 Added in v1.0.0
 
 # Instances
+
+## Applicative
+
+**Signature**
+
+```ts
+export declare const Applicative: Applicative1<'ReadonlyAtom'>
+```
+
+Added in v1.1.0
+
+## Apply
+
+**Signature**
+
+```ts
+export declare const Apply: Apply1<'ReadonlyAtom'>
+```
+
+Added in v1.1.0
 
 ## FromIO
 
@@ -251,17 +290,29 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-export declare const isReadonlyAtom: <T>(fa: unknown) => fa is ReadonlyAtomImpl<T>
+export declare const isReadonlyAtom: <T>(fa: unknown) => fa is ReadonlyAtom<T>
 ```
 
 Added in v1.0.0
 
 # Utils
 
+## distinct
+
+Return a `ReadonlyAtom` from a `ReadonlyAtom` with new Eq instance.
+
+**Signature**
+
+```ts
+export declare const distinct: <A>(eq: Eq<A>) => Endomorphism<ReadonlyAtom<A>>
+```
+
+Added in v1.1.0
+
 ## withDefault
 
-Return an `ReadonlyAtom` from an `ReadonlyAtomOption` replacing `None` with
-the given value.
+Return a `ReadonlyAtom` from a `ReadonlyAtomOption` replacing `None` with the
+given value.
 
 **Signature**
 
