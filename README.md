@@ -1,4 +1,4 @@
-# fp-ts-atom
+# <a href="https://github.com/sukazavr/fp-ts-atom"><img src="https://raw.githubusercontent.com/sukazavr/fp-ts-atom/master/assets/logos/fp-ts-atom.svg" alt="fp-ts-atom" height="32px"></a>
 
 ![Test](https://github.com/sukazavr/fp-ts-atom/actions/workflows/build.yml/badge.svg)
 ![npm version](https://badge.fury.io/js/fp-ts-atom.svg)
