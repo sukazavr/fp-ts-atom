@@ -1,5 +1,5 @@
 import { eqStrict } from 'fp-ts/Eq'
-import { pipe } from 'fp-ts/function'
+import { identity, pipe } from 'fp-ts/function'
 import { getOrElse, isSome, none, some } from 'fp-ts/Option'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import * as L from 'monocle-ts/Lens'
@@ -151,6 +151,38 @@ describe('lens', () => {
     lensed.set(6)
     expect(lensed.get() === 6).toBeTruthy()
   })
+
+  it(
+    'should not change own and parent values',
+    fakeSchedulers((advance) => {
+      const a = ctorValue()
+      const atom = _.of(a)
+      const lensed = pipe(
+        atom,
+        _.lens(
+          L.lens(
+            (x) => x.a.b,
+            () => identity
+          )
+        )
+      )
+      // w/o subscription
+      expect(lensed.get()).toBe(a.a.b)
+      lensed.set(6)
+      expect(atom.get()).toBe(a)
+      expect(lensed.get()).toBe(a.a.b)
+      // with subscription
+      const next = jest.fn()
+      lensed.subscribe(next)
+      expect(lensed.get()).toBe(a.a.b)
+      advance(100)
+      lensed.set(97)
+      expect(atom.get()).toBe(a)
+      expect(lensed.get()).toBe(a.a.b)
+      expect(next).toHaveBeenCalledTimes(1)
+      expect(next).toHaveBeenLastCalledWith(a.a.b)
+    })
+  )
 
   it('should work with custom eq', () => {
     const a = ctorValue()
