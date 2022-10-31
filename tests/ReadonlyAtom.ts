@@ -18,11 +18,6 @@ const ctorValue = (): TestStruct => ({
 const testBasic = (ctorAtom: (v: TestStruct) => _.ReadonlyAtom<TestStruct>) => {
   describe('basic', () => {
     beforeEach(() => jest.useFakeTimers())
-    it('has eq', () => {
-      const v = ctorValue()
-      const a = ctorAtom(v)
-      expect(a.eq.equals(v, v)).toBeTruthy()
-    })
     it('w/o subscription', () => {
       const a = ctorValue()
       const atom = ctorAtom(a)
@@ -101,6 +96,15 @@ const testEq = (
     )
   })
 }
+
+describe('types', () => {
+  it('should support narrowing assignments', () => {
+    const fn = jest.fn((value: _.ReadonlyAtom<{ a: { b: number } }>) => value)
+    const value = _.of({ a: { b: 1, c: null, d: '3' }, b: 1, c: '3' })
+    fn(value)
+    expect(fn).toBeCalledWith(value)
+  })
+})
 
 describe('isReadonlyAtom', () => {
   it('should be true', () => {

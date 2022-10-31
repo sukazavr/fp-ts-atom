@@ -20,7 +20,7 @@ import { Mim } from './Mim'
  * @category Model
  */
 export interface ReadonlyAtom<T> extends Observable<T> {
-  eq: Eq<T>
+  // It hasn't `eq` prop because we want to support narrowing assignments
   get: () => T
 }
 
