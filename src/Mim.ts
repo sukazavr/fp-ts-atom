@@ -1,7 +1,9 @@
 /** @since 1.0.0 */
-import { Eq } from 'fp-ts/Eq'
+import type { Eq } from 'fp-ts/Eq'
 import { isNone, none, Option, some } from 'fp-ts/Option'
-import { noop, Observable, Subject, Subscriber, Subscription } from 'rxjs'
+import { Observable, Subject, Subscriber, Subscription } from 'rxjs'
+import type { Atom } from './Atom'
+import type { ReadonlyAtom } from './ReadonlyAtom'
 
 /**
  * @since 1.0.0
@@ -34,8 +36,10 @@ export class Mim<T> extends Subject<T> {
     if (!this._subscription) {
       this._subscription = this.source$.subscribe({
         next: this.setValue,
-        // TODO: print in console in dev mode
-        error: noop,
+        error: (err) => {
+          // Use square brackets to prevent compiler cutout
+          console['error'](`Source of Atom or ReadonlyAtom has errored`, err)
+        },
       })
     }
     this._refCount++
@@ -97,4 +101,12 @@ export class Mim<T> extends Subject<T> {
     this._refCount = 0
     super.unsubscribe()
   }
+}
+
+/** @since 3.0.0 */
+export const protect = <T>(a: Atom<T> | ReadonlyAtom<T>): Mim<T> => {
+  if (!(a instanceof Mim)) {
+    throw new Error(`One of your Atom or ReadonlyAtom isn't an instance of Mim`)
+  }
+  return a
 }
