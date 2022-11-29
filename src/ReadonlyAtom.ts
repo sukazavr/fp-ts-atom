@@ -13,7 +13,7 @@ import * as RR from 'fp-ts/ReadonlyRecord'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import { Lens } from 'monocle-ts/Lens'
 import { combineLatest, EMPTY, map as rxMap, Observable } from 'rxjs'
-import { Mim } from './Mim'
+import { Mim, protect } from './Mim'
 
 /**
  * @since 1.0.0
@@ -186,8 +186,10 @@ export const index: <A>(
  * @category Utils
  */
 export const distinct: <A>(eq: Eq<A>) => Endomorphism<ReadonlyAtom<A>> =
-  (eq) => (a) =>
-    make(a.get, a, eq)
+  (eq) => (a) => {
+    const m = protect(a)
+    return make(m.evaluate, m.source$, eq)
+  }
 
 /**
  * Return a `ReadonlyAtom` from a `ReadonlyAtomOption` replacing `None` with the

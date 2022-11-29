@@ -11,7 +11,7 @@ import { Pointed1 } from 'fp-ts/Pointed'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import { Lens, lens as ctorLens } from 'monocle-ts/Lens'
 import { EMPTY, map, Observable } from 'rxjs'
-import { Mim } from './Mim'
+import { Mim, protect } from './Mim'
 import { make as arMake, ReadonlyAtom } from './ReadonlyAtom'
 
 /**
@@ -218,14 +218,8 @@ export const modifyV: <A>(a: Atom<A>) => (e: Endomorphism<A>) => void =
  */
 export const distinct: <A>(eq: Eq<A>) => Endomorphism<Atom<A>> =
   (eq) => (a) => {
-    const b = make(a.get, a, eq)
-    b.set = (nextB) => {
-      const prevB = a.get()
-      if (!eq.equals(prevB, nextB)) {
-        a.set(nextB)
-      }
-    }
-    return b
+    const m = protect(a)
+    return make(m.evaluate, m.source$, eq)
   }
 
 /**
