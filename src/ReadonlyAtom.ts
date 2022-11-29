@@ -24,15 +24,6 @@ export interface ReadonlyAtom<T> extends Observable<T> {
   get: () => T
 }
 
-/**
- * @since 1.0.0
- * @category Classes
- */
-export class ReadonlyAtomImpl<T> extends Mim<T> implements ReadonlyAtom<T> {
-  /** @since 1.0.0 */
-  public get = this.getValue
-}
-
 // -------------------------------------------------------------------------------------
 // refinements
 // -------------------------------------------------------------------------------------
@@ -56,8 +47,12 @@ export const make: <T>(
   evaluate: (prev: O.Option<T>) => T,
   source: Observable<T>,
   eq?: Eq<T>
-) => ReadonlyAtom<T> = (evaluate, source, eq = eqStrict) =>
-  new ReadonlyAtomImpl(evaluate, source, eq)
+) => ReadonlyAtom<T> = (evaluate, source, eq = eqStrict) => {
+  const instance = new Mim(evaluate, source, eq)
+  return Object.assign(instance, {
+    get: instance.getValue,
+  })
+}
 
 /**
  * @since 1.0.0
@@ -84,7 +79,7 @@ const _map: <B>(
   eq: Eq<B>
 ) => <A>(f: (a: A) => B) => (fa: ReadonlyAtom<A>) => ReadonlyAtom<B> =
   (eq) => (f) => (fa) =>
-    new ReadonlyAtomImpl(() => f(fa.get()), pipe(fa, rxMap(f)), eq)
+    make(() => f(fa.get()), pipe(fa, rxMap(f)), eq)
 
 const _mapStrict: <A, B>(
   f: (a: A) => B

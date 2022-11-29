@@ -24,17 +24,6 @@ export interface Atom<T> extends Observable<T> {
   set: (next: T) => void
 }
 
-/**
- * @since 1.0.0
- * @category Classes
- */
-export class AtomImpl<T> extends Mim<T> implements Atom<T> {
-  /** @since 1.0.0 */
-  public set = this.setValue
-  /** @since 1.0.0 */
-  public get = this.getValue
-}
-
 // -------------------------------------------------------------------------------------
 // refinements
 // -------------------------------------------------------------------------------------
@@ -58,8 +47,13 @@ export const make: <T>(
   evaluate: (prev: O.Option<T>) => T,
   source: Observable<T>,
   eq?: Eq<T>
-) => Atom<T> = (evaluate, source, eq = eqStrict) =>
-  new AtomImpl(evaluate, source, eq)
+) => Atom<T> = (evaluate, source, eq = eqStrict) => {
+  const instance = new Mim(evaluate, source, eq)
+  return Object.assign(instance, {
+    set: instance.setValue,
+    get: instance.getValue,
+  })
+}
 
 /**
  * @since 1.0.0

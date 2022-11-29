@@ -8,31 +8,33 @@ import { noop, Observable, Subject, Subscriber, Subscription } from 'rxjs'
  * @category Classes
  */
 export class Mim<T> extends Subject<T> {
+  /** @since 3.0.0 */
+  public evaluate: (prev: Option<T>) => T
+  /** @since 3.0.0 */
+  public source$: Observable<T>
   /** @since 1.0.0 */
-  public readonly eq: Eq<T>
+  public eq: Eq<T>
 
-  private readonly _evaluate: (prev: Option<T>) => T
-  private readonly _source: Observable<T>
-  private _prev: Option<T> = none
+  private _memo: Option<T> = none
   private _refCount = 0
   private _subscription?: Subscription
 
   constructor(
     evaluate: (prev: Option<T>) => T,
-    source: Observable<T>,
+    source$: Observable<T>,
     eq: Eq<T>
   ) {
     super()
+    this.evaluate = evaluate
+    this.source$ = source$
     this.eq = eq
-    this._evaluate = evaluate
-    this._source = source
   }
 
-  /** @since 1.0.0 */
   protected _subscribe(subscriber: Subscriber<T>): Subscription {
     if (!this._subscription) {
-      this._subscription = this._source.subscribe({
+      this._subscription = this.source$.subscribe({
         next: this.setValue,
+        // TODO: print in console in dev mode
         error: noop,
       })
     }
@@ -56,24 +58,24 @@ export class Mim<T> extends Subject<T> {
     return subMain
   }
 
-  private readonly setPrev = (value: T): T => {
-    this._prev = some(value)
+  private readonly setMemo = (value: T): T => {
+    this._memo = some(value)
     return value
   }
 
   /** @since 1.0.0 */
   public readonly getValue = (): T => {
-    if (isNone(this._prev)) {
-      return this.setPrev(this._evaluate(none))
+    if (isNone(this._memo)) {
+      return this.setMemo(this.evaluate(none))
     } else {
       if (this._subscription) {
-        return this._prev.value
+        return this._memo.value
       } else {
-        const next = this._evaluate(this._prev)
-        if (this.eq.equals(this._prev.value, next)) {
-          return this._prev.value
+        const next = this.evaluate(this._memo)
+        if (this.eq.equals(this._memo.value, next)) {
+          return this._memo.value
         } else {
-          return this.setPrev(next)
+          return this.setMemo(next)
         }
       }
     }
@@ -82,12 +84,12 @@ export class Mim<T> extends Subject<T> {
   /** @since 1.0.0 */
   public readonly setValue = (next: T): void => {
     if (!this.eq.equals(this.getValue(), next)) {
-      super.next(this.setPrev(next))
+      super.next(this.setMemo(next))
     }
   }
 
   /** @since 1.0.0 */
-  public unsubscribe = (): void => {
+  public readonly unsubscribe = (): void => {
     if (this._subscription) {
       this._subscription.unsubscribe()
       this._subscription = undefined
