@@ -11,11 +11,11 @@ import type { ReadonlyAtom } from './ReadonlyAtom'
  */
 export class Mim<T> extends Subject<T> {
   /** @since 3.0.0 */
-  public evaluate: (prev: Option<T>) => T
+  public readonly evaluate: (prev: Option<T>) => T
   /** @since 3.0.0 */
-  public source$: Observable<T>
+  public readonly source$: Observable<T>
   /** @since 1.0.0 */
-  public eq: Eq<T>
+  public readonly eq: Eq<T>
 
   private _memo: Option<T> = none
   private _refCount = 0
