@@ -334,3 +334,78 @@ describe('distinct', () => {
     )
   )
 })
+
+describe('chain', () => {
+  testBasic((v) =>
+    pipe(
+      _.of(1),
+      _.chain(() => _.of(v))
+    )
+  )
+  testEq((initial, source, eq) =>
+    pipe(
+      _.of(1),
+      _.chain(() =>
+        _.make(
+          getOrElse(() => initial),
+          source,
+          eq
+        )
+      )
+    )
+  )
+  describe('provides argument', () => {
+    beforeEach(() => jest.useFakeTimers())
+    it('w/o subscription', () => {
+      const makeInner = jest.fn((n: number) => _.of(n))
+      const a = Math.random()
+      const atom = pipe(_.of(a), _.chain(makeInner))
+      expect(atom.get()).toBe(a)
+      expect(makeInner).toHaveBeenCalledTimes(1)
+      expect(makeInner).toHaveBeenLastCalledWith(a)
+    })
+    it(
+      'with subscription',
+      fakeSchedulers((advance) => {
+        const makeInner = jest.fn((n: number) => _.of(n + 1))
+        const a = 543
+        const atom = pipe(
+          _.make(() => a, timer(1000)),
+          _.chain(makeInner)
+        )
+        const next = jest.fn()
+        atom.subscribe(next)
+        expect(makeInner).toHaveBeenCalledTimes(1)
+        expect(makeInner).toHaveBeenLastCalledWith(a)
+        expect(next).toHaveBeenCalledTimes(1)
+        expect(next).toHaveBeenLastCalledWith(a + 1)
+        advance(999)
+        expect(makeInner).toHaveBeenCalledTimes(1)
+        expect(makeInner).toHaveBeenLastCalledWith(a)
+        expect(next).toHaveBeenCalledTimes(1)
+        expect(next).toHaveBeenLastCalledWith(a + 1)
+        advance(1000)
+        expect(makeInner).toHaveBeenCalledTimes(2)
+        expect(makeInner).toHaveBeenLastCalledWith(0)
+        expect(next).toHaveBeenCalledTimes(2)
+        expect(next).toHaveBeenLastCalledWith(1)
+      })
+    )
+  })
+})
+
+describe('flatten', () => {
+  testBasic((v) => pipe(_.of(_.of(v)), _.flatten))
+  testEq((initial, source, eq) =>
+    pipe(
+      _.of(
+        _.make(
+          getOrElse(() => initial),
+          source,
+          eq
+        )
+      ),
+      _.flatten
+    )
+  )
+})

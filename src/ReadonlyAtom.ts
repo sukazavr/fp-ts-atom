@@ -1,19 +1,22 @@
 /** @since 1.0.0 */
 import { Applicative1 } from 'fp-ts/Applicative'
 import { Apply1 } from 'fp-ts/Apply'
+import { Chain1 } from 'fp-ts/Chain'
 import { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
 import { FromIO1 } from 'fp-ts/FromIO'
-import { Lazy, pipe } from 'fp-ts/function'
+import { flow, identity, Lazy, pipe } from 'fp-ts/function'
 import { Functor1 } from 'fp-ts/Functor'
+import { Monad1 } from 'fp-ts/Monad'
 import * as O from 'fp-ts/Option'
 import { Pointed1 } from 'fp-ts/Pointed'
 import * as AR from 'fp-ts/ReadonlyArray'
 import * as RR from 'fp-ts/ReadonlyRecord'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import { Lens } from 'monocle-ts/Lens'
-import { combineLatest, EMPTY, map as rxMap, Observable } from 'rxjs'
+import { combineLatest, EMPTY, map as rxMap, Observable, switchMap } from 'rxjs'
 import { Mim, protect } from './Mim'
+import { ctorMemoizeOnce } from './utils'
 
 /**
  * @since 1.0.0
@@ -115,6 +118,31 @@ export const ap: <A>(
     )
   )
 
+/**
+ * Composes computations in sequence, using the return value of one computation
+ * to determine the next computation.
+ *
+ * @since 3.0.0
+ * @category Sequencing
+ */
+export const chain: <A, B>(
+  f: (a: A) => ReadonlyAtom<B>
+) => (ma: ReadonlyAtom<A>) => ReadonlyAtom<B> = (f) => (ma) => {
+  const ma$ = protect(ma)
+  const getMb$ = ctorMemoizeOnce()(ma$.eq)(flow(f, protect))
+  return make(() => getMb$(ma.get()).get(), switchMap(getMb$)(ma), {
+    equals: (prev, next) => getMb$(ma.get()).eq.equals(prev, next),
+  })
+}
+
+/**
+ * @since 3.0.0
+ * @category Sequencing
+ */
+export const flatten: <A>(
+  mma: ReadonlyAtom<ReadonlyAtom<A>>
+) => ReadonlyAtom<A> = chain(identity)
+
 // -------------------------------------------------------------------------------------
 // compositions
 // -------------------------------------------------------------------------------------
@@ -210,6 +238,7 @@ export const withDefault: <A>(
 
 const map_: Functor1<URI>['map'] = (fa, f) => pipe(fa, map(f))
 const ap_: Apply1<URI>['ap'] = (fab, fa) => pipe(fab, ap(fa))
+const chain_: Chain1<URI>['chain'] = (ma, f) => pipe(ma, chain(f))
 
 /**
  * @since 1.0.0
@@ -274,5 +303,28 @@ export const Applicative: Applicative1<URI> = {
   URI,
   map: map_,
   ap: ap_,
+  of,
+}
+
+/**
+ * @since 3.0.0
+ * @category Instances
+ */
+export const Chain: Chain1<URI> = {
+  URI,
+  map: map_,
+  ap: ap_,
+  chain: chain_,
+}
+
+/**
+ * @since 3.0.0
+ * @category Instances
+ */
+export const Monad: Monad1<URI> = {
+  URI,
+  map: map_,
+  ap: ap_,
+  chain: chain_,
   of,
 }
