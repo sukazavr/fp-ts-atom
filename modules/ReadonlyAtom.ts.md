@@ -14,9 +14,6 @@ Added in v1.0.0
 
 - [Apply](#apply)
   - [ap](#ap)
-- [Classes](#classes)
-  - [ReadonlyAtomImpl (class)](#readonlyatomimpl-class)
-    - [get (property)](#get-property)
 - [Compositions](#compositions)
   - [index](#index)
   - [key](#key)
@@ -24,6 +21,7 @@ Added in v1.0.0
   - [prop](#prop)
 - [Constructors](#constructors)
   - [fromIO](#fromio)
+  - [getOf](#getof)
   - [make](#make)
   - [of](#of)
 - [Functor](#functor)
@@ -31,8 +29,10 @@ Added in v1.0.0
 - [Instances](#instances)
   - [Applicative](#applicative)
   - [Apply](#apply-1)
+  - [Chain](#chain)
   - [FromIO](#fromio)
   - [Functor](#functor-1)
+  - [Monad](#monad)
   - [Pointed](#pointed)
   - [URI](#uri)
   - [URI (type alias)](#uri-type-alias)
@@ -40,6 +40,9 @@ Added in v1.0.0
   - [ReadonlyAtom (interface)](#readonlyatom-interface)
 - [Refinements](#refinements)
   - [isReadonlyAtom](#isreadonlyatom)
+- [Sequencing](#sequencing)
+  - [chain](#chain)
+  - [flatten](#flatten)
 - [Utils](#utils)
   - [distinct](#distinct)
   - [withDefault](#withdefault)
@@ -60,28 +63,6 @@ export declare const ap: <A>(fa: ReadonlyAtom<A>) => <B>(fab: ReadonlyAtom<(a: A
 
 Added in v1.1.0
 
-# Classes
-
-## ReadonlyAtomImpl (class)
-
-**Signature**
-
-```ts
-export declare class ReadonlyAtomImpl<T>
-```
-
-Added in v1.0.0
-
-### get (property)
-
-**Signature**
-
-```ts
-get: () => T
-```
-
-Added in v1.0.0
-
 # Compositions
 
 ## index
@@ -97,7 +78,7 @@ you pass as `Option`.
 export declare const index: <A>(
   index: number,
   eq?: Eq<A> | undefined
-) => (sa: ReadonlyAtom<readonly A[]>) => ReadonlyAtom<O.Option<A>>
+) => (sa: ReadonlyAtom<readonly A[]>) => ReadonlyAtom<Option<A>>
 ```
 
 Added in v1.0.0
@@ -113,7 +94,7 @@ Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on a key of a
 export declare const key: <A>(
   key: string,
   eq?: Eq<A> | undefined
-) => (sa: ReadonlyAtom<Readonly<Record<string, A>>>) => ReadonlyAtom<O.Option<A>>
+) => (sa: ReadonlyAtom<Readonly<Record<string, A>>>) => ReadonlyAtom<Option<A>>
 ```
 
 Added in v1.0.0
@@ -157,16 +138,22 @@ export declare const fromIO: NaturalTransformation11<'IO', 'ReadonlyAtom'>
 
 Added in v1.0.0
 
+## getOf
+
+**Signature**
+
+```ts
+export declare const getOf: <A>(eq: Eq<A>) => (a: A) => ReadonlyAtom<A>
+```
+
+Added in v3.0.0
+
 ## make
 
 **Signature**
 
 ```ts
-export declare const make: <T>(
-  evaluate: (prev: O.Option<T>) => T,
-  source: any,
-  eq?: Eq<T> | undefined
-) => ReadonlyAtom<T>
+export declare const make: <T>(evaluate: (prev: Option<T>) => T, source: any, eq: Eq<T>) => ReadonlyAtom<T>
 ```
 
 Added in v1.0.0
@@ -218,6 +205,16 @@ export declare const Apply: Apply1<'ReadonlyAtom'>
 
 Added in v1.1.0
 
+## Chain
+
+**Signature**
+
+```ts
+export declare const Chain: Chain1<'ReadonlyAtom'>
+```
+
+Added in v3.0.0
+
 ## FromIO
 
 **Signature**
@@ -237,6 +234,16 @@ export declare const Functor: Functor1<'ReadonlyAtom'>
 ```
 
 Added in v1.0.0
+
+## Monad
+
+**Signature**
+
+```ts
+export declare const Monad: Monad1<'ReadonlyAtom'>
+```
+
+Added in v3.0.0
 
 ## Pointed
 
@@ -295,6 +302,31 @@ export declare const isReadonlyAtom: <T>(fa: unknown) => fa is ReadonlyAtom<T>
 
 Added in v1.0.0
 
+# Sequencing
+
+## chain
+
+Composes computations in sequence, using the return value of one computation
+to determine the next computation.
+
+**Signature**
+
+```ts
+export declare const chain: <A, B>(f: (a: A) => ReadonlyAtom<B>) => (ma: ReadonlyAtom<A>) => ReadonlyAtom<B>
+```
+
+Added in v3.0.0
+
+## flatten
+
+**Signature**
+
+```ts
+export declare const flatten: <A>(mma: ReadonlyAtom<ReadonlyAtom<A>>) => ReadonlyAtom<A>
+```
+
+Added in v3.0.0
+
 # Utils
 
 ## distinct
@@ -320,7 +352,7 @@ given value.
 export declare const withDefault: <A>(
   d: Lazy<A>,
   eq?: Eq<A> | undefined
-) => (sa: ReadonlyAtom<O.Option<A>>) => ReadonlyAtom<A>
+) => (sa: ReadonlyAtom<Option<A>>) => ReadonlyAtom<A>
 ```
 
 Added in v1.0.0

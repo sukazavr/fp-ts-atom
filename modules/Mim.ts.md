@@ -14,11 +14,15 @@ Added in v1.0.0
 
 - [Classes](#classes)
   - [Mim (class)](#mim-class)
-    - [\_subscribe (method)](#_subscribe-method)
+    - [evaluate (property)](#evaluate-property)
+    - [source$ (property)](#source-property)
     - [eq (property)](#eq-property)
     - [getValue (property)](#getvalue-property)
     - [setValue (property)](#setvalue-property)
     - [unsubscribe (property)](#unsubscribe-property)
+- [utils](#utils)
+  - [TypeOf (type alias)](#typeof-type-alias)
+  - [protect](#protect)
 
 ---
 
@@ -30,21 +34,31 @@ Added in v1.0.0
 
 ```ts
 export declare class Mim<T> {
-  constructor(evaluate: (prev: Option<T>) => T, source: Observable<T>, eq: Eq<T>)
+  constructor(evaluate: (prev: Option<T>) => T, source$: Observable<T>, eq: Eq<T>)
 }
 ```
 
 Added in v1.0.0
 
-### \_subscribe (method)
+### evaluate (property)
 
 **Signature**
 
 ```ts
-protected _subscribe(subscriber: Subscriber<T>): Subscription
+readonly evaluate: (prev: Option<T>) => T
 ```
 
-Added in v1.0.0
+Added in v3.0.0
+
+### source$ (property)
+
+**Signature**
+
+```ts
+readonly source$: any
+```
+
+Added in v3.0.0
 
 ### eq (property)
 
@@ -81,7 +95,35 @@ Added in v1.0.0
 **Signature**
 
 ```ts
-unsubscribe: () => void
+readonly unsubscribe: () => void
 ```
 
 Added in v1.0.0
+
+# utils
+
+## TypeOf (type alias)
+
+**Signature**
+
+```ts
+export type TypeOf<T> = T extends Atom<infer U1>
+  ? U1
+  : T extends ReadonlyAtom<infer U2>
+  ? U2
+  : T extends Mim<infer U3>
+  ? U3
+  : never
+```
+
+Added in v3.0.0
+
+## protect
+
+**Signature**
+
+```ts
+export declare const protect: <T extends Atom<unknown> | ReadonlyAtom<unknown>>(a: T) => T & Mim<TypeOf<T>>
+```
+
+Added in v3.0.0

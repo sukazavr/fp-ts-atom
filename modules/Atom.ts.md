@@ -12,10 +12,6 @@ Added in v1.0.0
 
 <h2 class="text-delta">Table of contents</h2>
 
-- [Classes](#classes)
-  - [AtomImpl (class)](#atomimpl-class)
-    - [set (property)](#set-property)
-    - [get (property)](#get-property)
 - [Compositions](#compositions)
   - [index](#index)
   - [key](#key)
@@ -23,6 +19,7 @@ Added in v1.0.0
   - [prop](#prop)
 - [Constructors](#constructors)
   - [fromIO](#fromio)
+  - [getOf](#getof)
   - [make](#make)
   - [of](#of)
 - [Converters](#converters)
@@ -44,38 +41,6 @@ Added in v1.0.0
 
 ---
 
-# Classes
-
-## AtomImpl (class)
-
-**Signature**
-
-```ts
-export declare class AtomImpl<T>
-```
-
-Added in v1.0.0
-
-### set (property)
-
-**Signature**
-
-```ts
-set: (next: T) => void
-```
-
-Added in v1.0.0
-
-### get (property)
-
-**Signature**
-
-```ts
-get: () => T
-```
-
-Added in v1.0.0
-
 # Compositions
 
 ## index
@@ -88,7 +53,7 @@ you pass as `Option`.
 **Signature**
 
 ```ts
-export declare const index: <A>(index: number, eq?: Eq<A> | undefined) => (sa: Atom<readonly A[]>) => Atom<O.Option<A>>
+export declare const index: <A>(index: number, eq?: Eq<A> | undefined) => (sa: Atom<readonly A[]>) => Atom<Option<A>>
 ```
 
 Added in v1.0.0
@@ -104,7 +69,7 @@ If you set `None` it won't change the `ReadonlyRecord`.
 export declare const key: <A>(
   key: string,
   eq?: Eq<A> | undefined
-) => (sa: Atom<Readonly<Record<string, A>>>) => Atom<O.Option<A>>
+) => (sa: Atom<Readonly<Record<string, A>>>) => Atom<Option<A>>
 ```
 
 Added in v1.0.0
@@ -145,12 +110,22 @@ export declare const fromIO: NaturalTransformation11<'IO', 'Atom'>
 
 Added in v1.0.0
 
+## getOf
+
+**Signature**
+
+```ts
+export declare const getOf: <A>(eq: Eq<A>) => (a: A) => Atom<A>
+```
+
+Added in v3.0.0
+
 ## make
 
 **Signature**
 
 ```ts
-export declare const make: <T>(evaluate: (prev: O.Option<T>) => T, source: any, eq?: Eq<T> | undefined) => Atom<T>
+export declare const make: <T>(evaluate: (prev: Option<T>) => T, source: any, eq: Eq<T>) => Atom<T>
 ```
 
 Added in v1.0.0
@@ -294,7 +269,7 @@ Return an `Atom` from an `AtomOption` replacing `None` with the given value.
 **Signature**
 
 ```ts
-export declare const withDefault: <A>(d: Lazy<A>, eq?: Eq<A> | undefined) => (sa: Atom<O.Option<A>>) => Atom<A>
+export declare const withDefault: <A>(d: Lazy<A>, eq?: Eq<A> | undefined) => (sa: Atom<Option<A>>) => Atom<A>
 ```
 
 Added in v1.0.0
