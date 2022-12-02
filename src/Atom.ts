@@ -46,8 +46,8 @@ export const isAtom = <T>(fa: unknown): fa is Atom<T> =>
 export const make: <T>(
   evaluate: (prev: O.Option<T>) => T,
   source: Observable<T>,
-  eq?: Eq<T>
-) => Atom<T> = (evaluate, source, eq = eqStrict) => {
+  eq: Eq<T>
+) => Atom<T> = (evaluate, source, eq) => {
   const instance = new Mim(evaluate, source, eq)
   return Object.assign(instance, {
     set: instance.setValue,
@@ -60,7 +60,7 @@ export const make: <T>(
  * @category Constructors
  */
 export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
-  make(O.getOrElse(ma), EMPTY)
+  make(O.getOrElse(ma), EMPTY, eqStrict)
 
 /**
  * @since 1.0.0
@@ -69,7 +69,8 @@ export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
 export const of: Applicative1<URI>['of'] = (a) =>
   make(
     O.getOrElse(() => a),
-    EMPTY
+    EMPTY,
+    eqStrict
   )
 
 // -------------------------------------------------------------------------------------

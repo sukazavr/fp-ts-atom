@@ -49,8 +49,8 @@ export const isReadonlyAtom = <T>(fa: unknown): fa is ReadonlyAtom<T> =>
 export const make: <T>(
   evaluate: (prev: O.Option<T>) => T,
   source: Observable<T>,
-  eq?: Eq<T>
-) => ReadonlyAtom<T> = (evaluate, source, eq = eqStrict) => {
+  eq: Eq<T>
+) => ReadonlyAtom<T> = (evaluate, source, eq) => {
   const instance = new Mim(evaluate, source, eq)
   return Object.assign(instance, {
     get: instance.getValue,
@@ -62,7 +62,7 @@ export const make: <T>(
  * @category Constructors
  */
 export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
-  make(O.getOrElse(ma), EMPTY)
+  make(O.getOrElse(ma), EMPTY, eqStrict)
 
 /**
  * @since 1.0.0
@@ -71,7 +71,8 @@ export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
 export const of: Applicative1<URI>['of'] = (a) =>
   make(
     O.getOrElse(() => a),
-    EMPTY
+    EMPTY,
+    eqStrict
   )
 
 // -------------------------------------------------------------------------------------
@@ -115,7 +116,8 @@ export const ap: <A>(
     pipe(
       combineLatest([fab, fa]),
       rxMap(([f, a]) => f(a))
-    )
+    ),
+    eqStrict
   )
 
 /**

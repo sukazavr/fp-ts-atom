@@ -370,7 +370,7 @@ describe('chain', () => {
         const makeInner = jest.fn((n: number) => _.of(n + 1))
         const a = 543
         const atom = pipe(
-          _.make(() => a, timer(1000)),
+          _.make(() => a, timer(1000), eqStrict),
           _.chain(makeInner)
         )
         const next = jest.fn()
