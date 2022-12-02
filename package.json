@@ -1,25 +1,91 @@
 {
   "name": "fp-ts-atom",
-  "homepage": "https://github.com/sukazavr/fp-ts-atom",
-  "version": "2.0.0",
-  "main": "dist/index.js",
+  "version": "3.0.0",
+  "description": "State management solution combining fp-ts, RxJS and monocle-ts",
   "license": "MIT",
+  "author": {
+    "name": "Dmitrii Bykov",
+    "email": "sukazavr@gmail.com",
+    "url": "https://sukazavr.ru"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sukazavr/fp-ts-atom"
+  },
+  "homepage": "https://sukazavr.github.io/fp-ts-atom/docs/modules",
+  "bugs": "https://github.com/sukazavr/fp-ts-atom/issues",
+  "keywords": [
+    "functional-programming",
+    "fp-ts",
+    "RxJS",
+    "monocle-ts",
+    "lens",
+    "state",
+    "manager",
+    "store",
+    "redux"
+  ],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs",
+      "types": "./dist/index.d.ts"
+    },
+    "./Mim": {
+      "require": "./dist/Mim.cjs",
+      "import": "./dist/Mim.mjs",
+      "types": "./dist/Mim.d.ts"
+    },
+    "./Atom": {
+      "require": "./dist/Atom.cjs",
+      "import": "./dist/Atom.mjs",
+      "types": "./dist/Atom.d.ts"
+    },
+    "./ReadonlyAtom": {
+      "require": "./dist/ReadonlyAtom.cjs",
+      "import": "./dist/ReadonlyAtom.mjs",
+      "types": "./dist/ReadonlyAtom.d.ts"
+    },
+    "./utils": {
+      "require": "./dist/utils.cjs",
+      "import": "./dist/utils.mjs",
+      "types": "./dist/utils.d.ts"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./dist/*.d.ts"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=14"
+  },
   "peerDependencies": {
     "fp-ts": "^2.11.7",
     "monocle-ts": "^2.0.0",
     "rxjs": "^7.0.0"
   },
-  "dependencies": {},
   "devDependencies": {
     "@types/jest": "^26.0.20",
     "@typescript-eslint/eslint-plugin": "^4.25.0",
     "@typescript-eslint/parser": "^4.25.0",
+    "del-cli": "^5.0.0",
     "docs-ts": "^0.6.10",
     "eslint": "^7.27.0",
     "fp-ts": "^2.11.7",
     "jest": "^26.6.3",
     "markdown-magic": "^2.0.0",
     "monocle-ts": "^2.3.11",
+    "pkgroll": "^1.6.0",
     "prettier": "^2.2.1",
     "prettier-plugin-jsdoc": "^0.3.13",
     "rxjs": "^7.5.2",
@@ -28,8 +94,7 @@
     "typescript": "^4.5.4"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "build:watch": "tsc -w -p tsconfig.build.json",
+    "build": "del-cli dist && pkgroll --minify",
     "prepublish": "npm run build",
     "pretty": "prettier --check .",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx --max-warnings 0",
