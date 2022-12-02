@@ -1,19 +1,19 @@
 /** @since 1.0.0 */
-import { Applicative1 } from 'fp-ts/Applicative'
-import { Apply1 } from 'fp-ts/Apply'
-import { Chain1 } from 'fp-ts/Chain'
-import { Endomorphism } from 'fp-ts/Endomorphism'
+import type { Applicative1 } from 'fp-ts/Applicative'
+import type { Apply1 } from 'fp-ts/Apply'
+import type { Chain1 } from 'fp-ts/Chain'
+import type { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
-import { FromIO1 } from 'fp-ts/FromIO'
+import type { FromIO1 } from 'fp-ts/FromIO'
 import { flow, identity, Lazy, pipe } from 'fp-ts/function'
-import { Functor1 } from 'fp-ts/Functor'
-import { Monad1 } from 'fp-ts/Monad'
-import * as O from 'fp-ts/Option'
-import { Pointed1 } from 'fp-ts/Pointed'
-import * as AR from 'fp-ts/ReadonlyArray'
-import * as RR from 'fp-ts/ReadonlyRecord'
-import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
-import { Lens } from 'monocle-ts/Lens'
+import type { Functor1 } from 'fp-ts/Functor'
+import { lookup as raLookup } from 'fp-ts/lib/ReadonlyArray'
+import { lookup as rrLookup } from 'fp-ts/lib/ReadonlyRecord'
+import type { Monad1 } from 'fp-ts/Monad'
+import { getEq as oGetEq, getOrElse as oGetOrElse, Option } from 'fp-ts/Option'
+import type { Pointed1 } from 'fp-ts/Pointed'
+import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
+import type { Lens } from 'monocle-ts/Lens'
 import { combineLatest, EMPTY, map as rxMap, Observable, switchMap } from 'rxjs'
 import { Mim, protect } from './Mim'
 import { ctorMemoizeOnce } from './utils'
@@ -47,7 +47,7 @@ export const isReadonlyAtom = <T>(fa: unknown): fa is ReadonlyAtom<T> =>
  * @category Constructors
  */
 export const make: <T>(
-  evaluate: (prev: O.Option<T>) => T,
+  evaluate: (prev: Option<T>) => T,
   source: Observable<T>,
   eq: Eq<T>
 ) => ReadonlyAtom<T> = (evaluate, source, eq) => {
@@ -62,7 +62,7 @@ export const make: <T>(
  * @category Constructors
  */
 export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
-  make(O.getOrElse(ma), EMPTY, eqStrict)
+  make(oGetOrElse(ma), EMPTY, eqStrict)
 
 /**
  * @since 1.0.0
@@ -70,7 +70,7 @@ export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
  */
 export const of: Applicative1<URI>['of'] = (a) =>
   make(
-    O.getOrElse(() => a),
+    oGetOrElse(() => a),
     EMPTY,
     eqStrict
   )
@@ -183,10 +183,8 @@ export const prop: <A, P extends keyof A>(
 export const key: <A>(
   key: string,
   eq?: Eq<A>
-) => (
-  sa: ReadonlyAtom<ReadonlyRecord<string, A>>
-) => ReadonlyAtom<O.Option<A>> = (k, eq = eqStrict) =>
-  _map(O.getEq(eq))(RR.lookup(k))
+) => (sa: ReadonlyAtom<ReadonlyRecord<string, A>>) => ReadonlyAtom<Option<A>> =
+  (k, eq = eqStrict) => _map(oGetEq(eq))(rrLookup(k))
 
 /**
  * Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on an index of a
@@ -200,10 +198,10 @@ export const key: <A>(
 export const index: <A>(
   index: number,
   eq?: Eq<A>
-) => (sa: ReadonlyAtom<ReadonlyArray<A>>) => ReadonlyAtom<O.Option<A>> = (
+) => (sa: ReadonlyAtom<ReadonlyArray<A>>) => ReadonlyAtom<Option<A>> = (
   i,
   eq = eqStrict
-) => _map(O.getEq(eq))(AR.lookup(i))
+) => _map(oGetEq(eq))(raLookup(i))
 
 // -------------------------------------------------------------------------------------
 // utils
@@ -231,8 +229,8 @@ export const distinct: <A>(eq: Eq<A>) => Endomorphism<ReadonlyAtom<A>> =
 export const withDefault: <A>(
   d: Lazy<A>,
   eq?: Eq<A>
-) => (sa: ReadonlyAtom<O.Option<A>>) => ReadonlyAtom<A> = (d, eq = eqStrict) =>
-  _map(eq)(O.getOrElse(d))
+) => (sa: ReadonlyAtom<Option<A>>) => ReadonlyAtom<A> = (d, eq = eqStrict) =>
+  _map(eq)(oGetOrElse(d))
 
 // -------------------------------------------------------------------------------------
 // instances

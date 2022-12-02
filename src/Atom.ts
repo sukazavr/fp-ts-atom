@@ -1,15 +1,27 @@
 /** @since 1.0.0 */
-import { Applicative1 } from 'fp-ts/Applicative'
-import { Endomorphism } from 'fp-ts/Endomorphism'
+import type { Applicative1 } from 'fp-ts/Applicative'
+import type { Endomorphism } from 'fp-ts/Endomorphism'
 import { Eq, eqStrict } from 'fp-ts/Eq'
-import { FromIO1 } from 'fp-ts/FromIO'
+import type { FromIO1 } from 'fp-ts/FromIO'
 import { identity, Lazy, pipe } from 'fp-ts/function'
-import * as AR from 'fp-ts/lib/ReadonlyArray'
-import * as RR from 'fp-ts/lib/ReadonlyRecord'
-import * as O from 'fp-ts/Option'
-import { Pointed1 } from 'fp-ts/Pointed'
-import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
-import { Lens, lens as ctorLens } from 'monocle-ts/Lens'
+import {
+  lookup as raLookup,
+  unsafeUpdateAt as raUnsafeUpdateAt,
+} from 'fp-ts/lib/ReadonlyArray'
+import {
+  lookup as rrLookup,
+  upsertAt as rrUpsertAt,
+} from 'fp-ts/lib/ReadonlyRecord'
+import {
+  fold as oFold,
+  getEq as oGetEq,
+  getOrElse as oGetOrElse,
+  Option,
+  some,
+} from 'fp-ts/Option'
+import type { Pointed1 } from 'fp-ts/Pointed'
+import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
+import type { Lens } from 'monocle-ts/Lens'
 import { EMPTY, map, Observable } from 'rxjs'
 import { Mim, protect } from './Mim'
 import { make as arMake, ReadonlyAtom } from './ReadonlyAtom'
@@ -44,7 +56,7 @@ export const isAtom = <T>(fa: unknown): fa is Atom<T> =>
  * @category Constructors
  */
 export const make: <T>(
-  evaluate: (prev: O.Option<T>) => T,
+  evaluate: (prev: Option<T>) => T,
   source: Observable<T>,
   eq: Eq<T>
 ) => Atom<T> = (evaluate, source, eq) => {
@@ -60,7 +72,7 @@ export const make: <T>(
  * @category Constructors
  */
 export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
-  make(O.getOrElse(ma), EMPTY, eqStrict)
+  make(oGetOrElse(ma), EMPTY, eqStrict)
 
 /**
  * @since 1.0.0
@@ -68,7 +80,7 @@ export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
  */
 export const of: Applicative1<URI>['of'] = (a) =>
   make(
-    O.getOrElse(() => a),
+    oGetOrElse(() => a),
     EMPTY,
     eqStrict
   )
@@ -124,10 +136,10 @@ export const prop: <A, P extends keyof A>(
   eq?: Eq<A[P]>
 ) => (sa: Atom<A>) => Atom<A[P]> = (prop, eq = eqStrict) =>
   lens(
-    ctorLens(
-      (s) => s[prop],
-      (ap) => (s) => Object.assign({}, s, { [prop]: ap })
-    ),
+    {
+      get: (s) => s[prop],
+      set: (ap) => (s) => Object.assign({}, s, { [prop]: ap }),
+    },
     eq
   )
 
@@ -141,19 +153,19 @@ export const prop: <A, P extends keyof A>(
 export const key: <A>(
   key: string,
   eq?: Eq<A>
-) => (sa: Atom<ReadonlyRecord<string, A>>) => Atom<O.Option<A>> = (
+) => (sa: Atom<ReadonlyRecord<string, A>>) => Atom<Option<A>> = (
   k,
   eq = eqStrict
 ) =>
   lens(
-    ctorLens(
-      RR.lookup(k),
-      O.fold(
+    {
+      get: rrLookup(k),
+      set: oFold(
         () => identity,
-        (a) => RR.upsertAt(k, a)
-      )
-    ),
-    O.getEq(eq)
+        (a) => rrUpsertAt(k, a)
+      ),
+    },
+    oGetEq(eq)
   )
 
 /**
@@ -168,23 +180,23 @@ export const key: <A>(
 export const index: <A>(
   index: number,
   eq?: Eq<A>
-) => (sa: Atom<ReadonlyArray<A>>) => Atom<O.Option<A>> = (i, eq = eqStrict) =>
+) => (sa: Atom<ReadonlyArray<A>>) => Atom<Option<A>> = (i, eq = eqStrict) =>
   lens(
-    ctorLens(
-      AR.lookup(i),
-      O.fold(
+    {
+      get: raLookup(i),
+      set: oFold(
         () => identity,
         (a) => (s) =>
           pipe(
-            AR.lookup(i, s),
-            O.fold(
+            raLookup(i, s),
+            oFold(
               () => s,
-              () => AR.unsafeUpdateAt(i, a, s)
+              () => raUnsafeUpdateAt(i, a, s)
             )
           )
-      )
-    ),
-    O.getEq(eq)
+      ),
+    },
+    oGetEq(eq)
   )
 
 // -------------------------------------------------------------------------------------
@@ -232,11 +244,8 @@ export const distinct: <A>(eq: Eq<A>) => Endomorphism<Atom<A>> =
 export const withDefault: <A>(
   d: Lazy<A>,
   eq?: Eq<A>
-) => (sa: Atom<O.Option<A>>) => Atom<A> = (d, eq = eqStrict) =>
-  lens(
-    ctorLens(O.getOrElse(d), (a) => () => O.some(a)),
-    eq
-  )
+) => (sa: Atom<Option<A>>) => Atom<A> = (d, eq = eqStrict) =>
+  lens({ get: oGetOrElse(d), set: (a) => () => some(a) }, eq)
 
 // -------------------------------------------------------------------------------------
 // instances
