@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { eqStrict } from 'fp-ts/Eq'
 import { getOrElse, none, Option, some } from 'fp-ts/Option'
-import { EMPTY, interval, map, mapTo, NEVER, Observable, of } from 'rxjs'
+import { EMPTY, interval, map, mapTo, NEVER, noop, Observable, of } from 'rxjs'
 import { fakeSchedulers } from 'rxjs-marbles/jest'
 import { Mim } from '../src'
+
+beforeAll(() => {
+  jest.spyOn(console, 'error').mockImplementation(noop)
+})
 
 type TestStruct = { n: number }
 const gen = (): TestStruct => ({ n: Math.random() })

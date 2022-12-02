@@ -104,9 +104,20 @@ export class Mim<T> extends Subject<T> {
 }
 
 /** @since 3.0.0 */
-export const protect = <T>(a: Atom<T> | ReadonlyAtom<T>): Mim<T> => {
+export const protect = <T extends Atom<unknown> | ReadonlyAtom<unknown>>(
+  a: T
+): T & Mim<TypeOf<T>> => {
   if (!(a instanceof Mim)) {
     throw new Error(`One of your Atom or ReadonlyAtom isn't an instance of Mim`)
   }
   return a
 }
+
+/** @since 3.0.0 */
+export type TypeOf<T> = T extends Atom<infer U1>
+  ? U1
+  : T extends ReadonlyAtom<infer U2>
+  ? U2
+  : T extends Mim<infer U3>
+  ? U3
+  : never

@@ -218,8 +218,8 @@ export const modifyV: <A>(a: Atom<A>) => (e: Endomorphism<A>) => void =
  */
 export const distinct: <A>(eq: Eq<A>) => Endomorphism<Atom<A>> =
   (eq) => (a) => {
-    const m = protect(a)
-    return make(m.evaluate, m.source$, eq)
+    const ma$ = protect(a)
+    return make(ma$.evaluate, ma$.source$, eq)
   }
 
 /**

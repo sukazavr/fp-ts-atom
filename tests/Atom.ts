@@ -8,6 +8,10 @@ import { fakeSchedulers } from 'rxjs-marbles/jest'
 import * as _ from '../src/Atom'
 import * as ar from '../src/ReadonlyAtom'
 
+beforeAll(() => {
+  jest.spyOn(console, 'error').mockImplementation(noop)
+})
+
 type TestStruct = { a: { b: number } }
 
 const ctorValue = (): TestStruct => ({

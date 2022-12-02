@@ -4,10 +4,15 @@ import { getOrElse, none, Some } from 'fp-ts/Option'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import * as L from 'monocle-ts/Lens'
 import * as r from 'rxjs'
+import { noop, timer } from 'rxjs'
 import { fakeSchedulers } from 'rxjs-marbles/jest'
 import * as ro from 'rxjs/operators'
 import * as a from '../src/Atom'
 import * as _ from '../src/ReadonlyAtom'
+
+beforeAll(() => {
+  jest.spyOn(console, 'error').mockImplementation(noop)
+})
 
 type TestStruct = { a: { b: number } }
 
