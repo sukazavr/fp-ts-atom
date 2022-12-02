@@ -3,7 +3,7 @@ import { eqStrict } from 'fp-ts/Eq'
 import { getOrElse, none, Option, some } from 'fp-ts/Option'
 import { EMPTY, interval, map, mapTo, NEVER, noop, Observable, of } from 'rxjs'
 import { fakeSchedulers } from 'rxjs-marbles/jest'
-import { Mim } from '../src'
+import { Mim } from '../src/Mim'
 
 beforeAll(() => {
   jest.spyOn(console, 'error').mockImplementation(noop)
