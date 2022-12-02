@@ -32,6 +32,7 @@ export class Mim<T> extends Subject<T> {
     this.eq = eq
   }
 
+  /** @internal */
   protected _subscribe(subscriber: Subscriber<T>): Subscription {
     if (!this._subscription) {
       this._subscription = this.source$.subscribe({

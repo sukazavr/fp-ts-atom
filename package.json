@@ -12,7 +12,7 @@
     "type": "git",
     "url": "https://github.com/sukazavr/fp-ts-atom"
   },
-  "homepage": "https://sukazavr.github.io/fp-ts-atom/docs/modules",
+  "homepage": "https://github.com/sukazavr/fp-ts-atom",
   "bugs": "https://github.com/sukazavr/fp-ts-atom/issues",
   "keywords": [
     "functional-programming",

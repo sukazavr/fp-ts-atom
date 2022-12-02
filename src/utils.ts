@@ -1,3 +1,4 @@
+/** @since 3.0.0 */
 import { eqStrict } from 'fp-ts/Eq'
 import type { Eq } from 'fp-ts/Eq'
 import { pipe } from 'fp-ts/function'
@@ -29,5 +30,6 @@ export const ctorMemoizeOnce = () => {
       )
 }
 
+/** @since 3.0.0 */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const eqAny: Eq<any> = eqStrict
