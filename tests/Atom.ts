@@ -1,4 +1,4 @@
-import { eqStrict } from 'fp-ts/Eq'
+import { eqStrict, struct } from 'fp-ts/Eq'
 import { identity, pipe } from 'fp-ts/function'
 import { getOrElse, isSome, none, some } from 'fp-ts/Option'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
@@ -13,6 +13,12 @@ beforeAll(() => {
 })
 
 type TestStruct = { a: { b: number } }
+
+const eqTestStruct = struct<TestStruct>({
+  a: struct({
+    b: eqStrict,
+  }),
+})
 
 const ctorValue = (): TestStruct => ({
   a: { b: Math.round(Math.random() * 100) },
@@ -113,6 +119,18 @@ describe('fromIO', () => {
 
 describe('of', () => {
   testBasic((v) => _.of(v))
+})
+
+describe('getOf', () => {
+  testBasic(_.getOf(eqTestStruct))
+  it('should ignore setting the structurally equal value', () => {
+    const a = ctorValue()
+    const aClone: TestStruct = { a: { b: a.a.b } }
+    const root = _.getOf(eqTestStruct)(a)
+    expect(root.get() === a).toBeTruthy()
+    root.set(aClone)
+    expect(root.get() === a).toBeTruthy()
+  })
 })
 
 describe('lens', () => {

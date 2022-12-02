@@ -3,7 +3,7 @@ import type { Applicative1 } from 'fp-ts/Applicative'
 import type { Apply1 } from 'fp-ts/Apply'
 import type { Chain1 } from 'fp-ts/Chain'
 import type { Endomorphism } from 'fp-ts/Endomorphism'
-import { Eq, eqStrict } from 'fp-ts/Eq'
+import type { Eq } from 'fp-ts/Eq'
 import type { FromIO1 } from 'fp-ts/FromIO'
 import { flow, identity, Lazy, pipe } from 'fp-ts/function'
 import type { Functor1 } from 'fp-ts/Functor'
@@ -16,7 +16,7 @@ import type { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
 import type { Lens } from 'monocle-ts/Lens'
 import { combineLatest, EMPTY, map as rxMap, Observable, switchMap } from 'rxjs'
 import { Mim, protect } from './Mim'
-import { ctorMemoizeOnce } from './utils'
+import { ctorMemoizeOnce, eqAny } from './utils'
 
 /**
  * @since 1.0.0
@@ -62,18 +62,24 @@ export const make: <T>(
  * @category Constructors
  */
 export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
-  make(oGetOrElse(ma), EMPTY, eqStrict)
+  make(oGetOrElse(ma), EMPTY, eqAny)
+
+/**
+ * @since 3.0.0
+ * @category Constructors
+ */
+export const getOf: <A>(eq: Eq<A>) => (a: A) => ReadonlyAtom<A> = (eq) => (a) =>
+  make(
+    oGetOrElse(() => a),
+    EMPTY,
+    eq
+  )
 
 /**
  * @since 1.0.0
  * @category Constructors
  */
-export const of: Applicative1<URI>['of'] = (a) =>
-  make(
-    oGetOrElse(() => a),
-    EMPTY,
-    eqStrict
-  )
+export const of: Pointed1<URI>['of'] = getOf(eqAny)
 
 // -------------------------------------------------------------------------------------
 // type class members
@@ -88,7 +94,7 @@ const _map: <B>(
 const _mapStrict: <A, B>(
   f: (a: A) => B
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-) => (fa: ReadonlyAtom<A>) => ReadonlyAtom<B> = _map(eqStrict as Eq<any>)
+) => (fa: ReadonlyAtom<A>) => ReadonlyAtom<B> = _map(eqAny as Eq<any>)
 
 /**
  * `map` can be used to turn functions `(a: A) => B` into functions `(fa: F<A>)
@@ -117,7 +123,7 @@ export const ap: <A>(
       combineLatest([fab, fa]),
       rxMap(([f, a]) => f(a))
     ),
-    eqStrict
+    eqAny
   )
 
 /**
@@ -158,7 +164,7 @@ export const flatten: <A>(
 export const lens: <A, B>(
   ab: Lens<A, B>,
   eq?: Eq<B>
-) => (a: ReadonlyAtom<A>) => ReadonlyAtom<B> = (ab, eq = eqStrict) =>
+) => (a: ReadonlyAtom<A>) => ReadonlyAtom<B> = (ab, eq = eqAny) =>
   _map(eq)(ab.get)
 
 /**
@@ -170,7 +176,7 @@ export const lens: <A, B>(
 export const prop: <A, P extends keyof A>(
   prop: P,
   eq?: Eq<A[P]>
-) => (sa: ReadonlyAtom<A>) => ReadonlyAtom<A[P]> = (prop, eq = eqStrict) =>
+) => (sa: ReadonlyAtom<A>) => ReadonlyAtom<A[P]> = (prop, eq = eqAny) =>
   _map(eq)((s) => s[prop])
 
 /**
@@ -184,7 +190,7 @@ export const key: <A>(
   key: string,
   eq?: Eq<A>
 ) => (sa: ReadonlyAtom<ReadonlyRecord<string, A>>) => ReadonlyAtom<Option<A>> =
-  (k, eq = eqStrict) => _map(oGetEq(eq))(rrLookup(k))
+  (k, eq = eqAny) => _map(oGetEq(eq))(rrLookup(k))
 
 /**
  * Return a `ReadonlyAtomOption` from a `ReadonlyAtom` focused on an index of a
@@ -200,7 +206,7 @@ export const index: <A>(
   eq?: Eq<A>
 ) => (sa: ReadonlyAtom<ReadonlyArray<A>>) => ReadonlyAtom<Option<A>> = (
   i,
-  eq = eqStrict
+  eq = eqAny
 ) => _map(oGetEq(eq))(raLookup(i))
 
 // -------------------------------------------------------------------------------------
@@ -229,7 +235,7 @@ export const distinct: <A>(eq: Eq<A>) => Endomorphism<ReadonlyAtom<A>> =
 export const withDefault: <A>(
   d: Lazy<A>,
   eq?: Eq<A>
-) => (sa: ReadonlyAtom<Option<A>>) => ReadonlyAtom<A> = (d, eq = eqStrict) =>
+) => (sa: ReadonlyAtom<Option<A>>) => ReadonlyAtom<A> = (d, eq = eqAny) =>
   _map(eq)(oGetOrElse(d))
 
 // -------------------------------------------------------------------------------------

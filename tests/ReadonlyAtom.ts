@@ -1,4 +1,4 @@
-import { contramap, Eq, eqStrict } from 'fp-ts/Eq'
+import { contramap, Eq, eqStrict, struct } from 'fp-ts/Eq'
 import { pipe } from 'fp-ts/function'
 import { getOrElse, none, Some } from 'fp-ts/Option'
 import { ReadonlyRecord } from 'fp-ts/ReadonlyRecord'
@@ -15,6 +15,12 @@ beforeAll(() => {
 })
 
 type TestStruct = { a: { b: number } }
+
+const eqTestStruct = struct<TestStruct>({
+  a: struct({
+    b: eqStrict,
+  }),
+})
 
 const ctorValue = (): TestStruct => ({
   a: { b: Math.round(Math.random() * 100) },
@@ -148,6 +154,10 @@ describe('fromIO', () => {
 
 describe('of', () => {
   testBasic((v) => _.of(v))
+})
+
+describe('getOf', () => {
+  testBasic(_.getOf(eqTestStruct))
 })
 
 describe('map', () => {

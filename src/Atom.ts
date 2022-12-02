@@ -1,7 +1,6 @@
 /** @since 1.0.0 */
-import type { Applicative1 } from 'fp-ts/Applicative'
 import type { Endomorphism } from 'fp-ts/Endomorphism'
-import { Eq, eqStrict } from 'fp-ts/Eq'
+import type { Eq } from 'fp-ts/Eq'
 import type { FromIO1 } from 'fp-ts/FromIO'
 import { identity, Lazy, pipe } from 'fp-ts/function'
 import {
@@ -25,6 +24,7 @@ import type { Lens } from 'monocle-ts/Lens'
 import { EMPTY, map, Observable } from 'rxjs'
 import { Mim, protect } from './Mim'
 import { make as arMake, ReadonlyAtom } from './ReadonlyAtom'
+import { eqAny } from './utils'
 
 /**
  * @since 1.0.0
@@ -72,18 +72,24 @@ export const make: <T>(
  * @category Constructors
  */
 export const fromIO: FromIO1<URI>['fromIO'] = (ma) =>
-  make(oGetOrElse(ma), EMPTY, eqStrict)
+  make(oGetOrElse(ma), EMPTY, eqAny)
+
+/**
+ * @since 3.0.0
+ * @category Constructors
+ */
+export const getOf: <A>(eq: Eq<A>) => (a: A) => Atom<A> = (eq) => (a) =>
+  make(
+    oGetOrElse(() => a),
+    EMPTY,
+    eq
+  )
 
 /**
  * @since 1.0.0
  * @category Constructors
  */
-export const of: Applicative1<URI>['of'] = (a) =>
-  make(
-    oGetOrElse(() => a),
-    EMPTY,
-    eqStrict
-  )
+export const of: Pointed1<URI>['of'] = getOf(eqAny)
 
 // -------------------------------------------------------------------------------------
 // converters
@@ -112,7 +118,7 @@ export const lens: <A, B>(
   ab: Lens<A, B>,
   eq?: Eq<B>
 ) => (a: Atom<A>) => Atom<B> =
-  (ab, eq = eqStrict) =>
+  (ab, eq = eqAny) =>
   (a) => {
     const b = make(() => ab.get(a.get()), map(ab.get)(a), eq)
     b.set = (nextB) => {
@@ -134,7 +140,7 @@ export const lens: <A, B>(
 export const prop: <A, P extends keyof A>(
   prop: P,
   eq?: Eq<A[P]>
-) => (sa: Atom<A>) => Atom<A[P]> = (prop, eq = eqStrict) =>
+) => (sa: Atom<A>) => Atom<A[P]> = (prop, eq = eqAny) =>
   lens(
     {
       get: (s) => s[prop],
@@ -155,7 +161,7 @@ export const key: <A>(
   eq?: Eq<A>
 ) => (sa: Atom<ReadonlyRecord<string, A>>) => Atom<Option<A>> = (
   k,
-  eq = eqStrict
+  eq = eqAny
 ) =>
   lens(
     {
@@ -180,7 +186,7 @@ export const key: <A>(
 export const index: <A>(
   index: number,
   eq?: Eq<A>
-) => (sa: Atom<ReadonlyArray<A>>) => Atom<Option<A>> = (i, eq = eqStrict) =>
+) => (sa: Atom<ReadonlyArray<A>>) => Atom<Option<A>> = (i, eq = eqAny) =>
   lens(
     {
       get: raLookup(i),
@@ -244,7 +250,7 @@ export const distinct: <A>(eq: Eq<A>) => Endomorphism<Atom<A>> =
 export const withDefault: <A>(
   d: Lazy<A>,
   eq?: Eq<A>
-) => (sa: Atom<Option<A>>) => Atom<A> = (d, eq = eqStrict) =>
+) => (sa: Atom<Option<A>>) => Atom<A> = (d, eq = eqAny) =>
   lens({ get: oGetOrElse(d), set: (a) => () => some(a) }, eq)
 
 // -------------------------------------------------------------------------------------
